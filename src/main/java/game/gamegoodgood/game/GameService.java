@@ -16,18 +16,22 @@ import java.io.StringReader;
 public class GameService {
 
     private final WebClient webClient;
-    private final ObjectMapper objectMapper;
 
-    public GameService(WebClient webClient, ObjectMapper objectMapper) {
+    public GameService(WebClient webClient) {
         this.webClient = webClient;
-        this.objectMapper = objectMapper;
     }
 
-    public GameDto find() {
+    public GameDto find(String display, String pageNo, String gametitle, String entname, String rateno) {
+        // URL 생성
+        String uri = String.format(
+                "https://www.grac.or.kr/WebService/GameSearchSvc.asmx/game?display=%s&pageno=%s&gametitle=%s&entname=%s&rateno=%s",
+                display, pageNo, gametitle, entname, rateno
+        );
+
         try {
             String xml = webClient
                     .get()
-                    .uri("https://www.grac.or.kr/WebService/GameSearchSvc.asmx/game?display=10&pageno=1")
+                    .uri(uri)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -36,20 +40,13 @@ public class GameService {
                 throw new RuntimeException("Received empty XML response");
             }
 
-            // XML을 GameDto로 변환
             JAXBContext jaxbContext = JAXBContext.newInstance(GameDto.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             GameDto gameResponse = (GameDto) unmarshaller.unmarshal(new StringReader(xml));
 
-            // GameDto를 JSON으로 변환
-            String jsonString = objectMapper.writeValueAsString(gameResponse);
-
-            // JSON 문자열을 다시 GameDto로 변환
-            return objectMapper.readValue(jsonString, GameDto.class);
-
+            return gameResponse;
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while retrieving game data", e);
         }
     }
 }
-
