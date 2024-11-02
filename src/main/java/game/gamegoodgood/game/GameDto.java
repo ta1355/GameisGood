@@ -8,8 +8,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @Data
-@XmlRootElement(name = "result")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "result")  //xml 문서 루트 최상위 요소를 나태내는것을 정의, 최상위 태그가 이 클래스의 인스턴스에 매핑됨
+@XmlAccessorType(XmlAccessType.FIELD)  //jaxb가 필드를 어떻게 접근할지를 정의  FIELD는 클래스의 필드를 통해 매핑함
 public class GameDto {
 
         @XmlElement(name = "item")
@@ -24,7 +24,7 @@ public class GameDto {
         @XmlElement(name = "res_date")
         private String responseDate;
 
-        @Data
+        @Data //getter setter toString 등등 줄이기
         @XmlAccessorType(XmlAccessType.FIELD)
         public static class Item {
                 @XmlElement(name = "rateno")

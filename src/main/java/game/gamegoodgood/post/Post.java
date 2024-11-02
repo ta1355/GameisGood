@@ -32,7 +32,6 @@ public class Post {
     @ManyToOne
     private Users users;
 
-
     @OneToMany(mappedBy = "post")
     private List<Comment> comments = new ArrayList<>();
 
@@ -64,7 +63,6 @@ public class Post {
     public LocalDateTime getCreateDateTime() {
         return createDateTime;
     }
-
 
     public LocalDateTime getDeletedDateTime() {
         return deletedDateTime;
