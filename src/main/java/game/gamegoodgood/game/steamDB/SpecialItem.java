@@ -18,6 +18,9 @@ public class SpecialItem {
     private String headerImage;
     private String headline;
 
+    public SpecialItem() {
+    }
+
     public SpecialItem(int id, String name, boolean discounted, int discountPercent, int originalPrice, int finalPrice, String currency, String largeCapsuleImage, String smallCapsuleImage, boolean windowsAvailable, boolean macAvailable, boolean linuxAvailable, boolean streamingVideoAvailable, long discountExpiration, String headerImage, String headline) {
         this.id = id;
         this.name = name;
@@ -164,4 +167,13 @@ public class SpecialItem {
     public void setHeadline(String headline) {
         this.headline = headline;
     }
+
+    public String getFormattedOriginalPrice() {
+        return String.format("%,d원", originalPrice / 100);
+    }
+
+    public String getFormattedFinalPrice() {
+        return String.format("%,d원", finalPrice / 100);
+    }
+
 }

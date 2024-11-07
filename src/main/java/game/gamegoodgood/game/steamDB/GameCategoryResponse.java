@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GameCategoryResponse {
+
+
     private List<SpecialItem> specials;
 
 
@@ -20,4 +22,5 @@ public class GameCategoryResponse {
     public void setSpecials(List<SpecialItem> specials) {
         this.specials = specials;
     }
+
 }
