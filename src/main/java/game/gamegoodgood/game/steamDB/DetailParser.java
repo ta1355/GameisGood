@@ -165,10 +165,7 @@ public class DetailParser {
                 if (movieJson.has("mp4")) {
                     JSONObject mp4Json = movieJson.getJSONObject("mp4");
 
-                    // "max"와 "480" 해상도 URL을 모두 추출하여 리스트에 추가
-                    if (mp4Json.has("480")) {
-                        movieUrls.add(mp4Json.getString("480"));
-                    }
+                    // "max" 해상도 URL만 추가
                     if (mp4Json.has("max")) {
                         movieUrls.add(mp4Json.getString("max"));
                     }
