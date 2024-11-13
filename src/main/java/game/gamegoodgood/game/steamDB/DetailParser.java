@@ -12,7 +12,7 @@ import java.util.Map;
 public class DetailParser {
 
     private Long extractIdFromUrl(String url) {
-        int startIndex = url.indexOf("appids="); // "appids="가 시작하는 인덱스 찾기
+        int startIndex = url.indexOf("appids=");
         if (startIndex != -1) {
             String idString = url.substring(startIndex + 7);
             int endIndex = idString.indexOf("&");
@@ -20,7 +20,7 @@ public class DetailParser {
                 idString = idString.substring(0, endIndex);
             }
             try {
-                return Long.parseLong(idString); // ID를 Long으로 변환
+                return Long.parseLong(idString);
             } catch (NumberFormatException e) {
                 System.err.println("ID 파싱 오류: " + e.getMessage());
             }
@@ -62,6 +62,10 @@ public class DetailParser {
 
     private DetailItem parseDetail(JSONObject itemJson) {
 
+
+        String releaseDateString = itemJson.optString("release_date", "");
+        String formattedReleaseDate = formatReleaseDate(releaseDateString);
+
         Map<String, String> mp4Urls = new HashMap<>();
         if (itemJson.has("mp4")) {
             JSONObject mp4Json = itemJson.getJSONObject("mp4");
@@ -93,7 +97,7 @@ public class DetailParser {
                 itemJson.optString("header_image", ""),
                 itemJson.optString("capsule_image", ""),
                 itemJson.optString("website", ""),
-                itemJson.optString("release_date", ""),
+                formattedReleaseDate,
                 itemJson.optBoolean("coming_soon", false),
                 itemJson.optJSONObject("support_info").optString("url", ""),
                 itemJson.optJSONObject("support_info").optString("email", ""),
@@ -108,9 +112,25 @@ public class DetailParser {
                 itemJson.optInt("discount_percent", 0),
                 itemJson.optString("background", ""),
                 screenshots,
-                movies, // 수정된 부분
+                movies,
                 mp4Urls
         );
+    }
+
+    // release_date를 파싱하여 "date" 값을 추출하는 메서드
+    private String formatReleaseDate(String releaseDateString) {
+        try {
+            JSONObject releaseDateJson = new JSONObject(releaseDateString);
+
+            if (!releaseDateJson.getBoolean("coming_soon") && releaseDateJson.has("date")) {
+                return releaseDateJson.getString("date");  // "2018년 8월 8일" 형태의 날짜 반환
+            } else {
+                return "날짜 정보 없음";  // coming_soon이 true인 경우 처리
+            }
+        } catch (Exception e) {
+            System.err.println("날짜 파싱 오류: " + e.getMessage());
+            return "날짜 정보 없음";
+        }
     }
 
     // HTML 태그를 제거하는 메서드
@@ -121,28 +141,23 @@ public class DetailParser {
         return input.replaceAll("<[^>]*>", "").replaceAll("&nbsp;", " ");
     }
 
-    // 스크린샷 배열에서 URL만 추출하는 메서드
     private List<String> jsonArrayToScreenshotUrls(JSONArray jsonArray) {
         List<String> screenshotUrls = new ArrayList<>();
         if (jsonArray != null) {
             for (int i = 0; i < jsonArray.length(); i++) {
-                // 각 항목이 JSON 문자열로 되어 있으므로 파싱
                 String screenshotJsonString = jsonArray.optString(i);
                 JSONObject screenshotJson = new JSONObject(screenshotJsonString);
 
-                // 'path_thumbnail' URL만 추출
                 screenshotUrls.add(screenshotJson.optString("path_thumbnail"));
             }
         }
         return screenshotUrls;
     }
 
-    // Movies 배열에서 mp4 URL을 추출하는 메서드
     private List<String> jsonArrayToMovies(JSONArray jsonArray) {
         List<String> movieUrls = new ArrayList<>();
         if (jsonArray != null) {
             for (int i = 0; i < jsonArray.length(); i++) {
-                // 각 항목이 JSON 문자열로 되어 있으므로 파싱
                 String movieJsonString = jsonArray.optString(i);
                 JSONObject movieJson = new JSONObject(movieJsonString);
 
