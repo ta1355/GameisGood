@@ -1,4 +1,4 @@
-package game.gamegoodgood.game.steamDB;
+package game.gamegoodgood.game.steamDB.special;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

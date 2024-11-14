@@ -1,4 +1,4 @@
-package game.gamegoodgood.game.steamDB;
+package game.gamegoodgood.game.steamDB.detail;
 
 import java.util.List;
 import java.util.Map;
@@ -33,11 +33,12 @@ public class DetailItem {
     private List<String> screenshots;
     private List<String> movies;
     private Map<String, String> mp4Urls;
+    private int steamAppId;
 
     protected DetailItem() {
     }
 
-    public DetailItem(String type, String name, int requiredAge, boolean isFree, String controllerSupport, String detailedDescription, String shortDescription, String fullGameName, String headerImage, String capsuleImage, String website, String releaseDate, boolean comingSoon, String supportUrl, String supportEmail, String contentNotes, String esrbRating, String esrbDescriptors, int esrbRequiredAge, List<String> developers, List<String> publishers, int initialPrice, int finalPrice, int discountPercent, String background, List<String> screenshots, List<String> movies, Map<String, String> mp4Urls) {
+    public DetailItem(String type, String name, int requiredAge, boolean isFree, String controllerSupport, String detailedDescription, String shortDescription, String fullGameName, String headerImage, String capsuleImage, String website, String releaseDate, boolean comingSoon, String supportUrl, String supportEmail, String contentNotes, String esrbRating, String esrbDescriptors, int esrbRequiredAge, List<String> developers, List<String> publishers, int initialPrice, int finalPrice, int discountPercent, String background, List<String> screenshots, List<String> movies, Map<String, String> mp4Urls, int steamAppId) {
         this.type = type;
         this.name = name;
         this.requiredAge = requiredAge;
@@ -66,6 +67,7 @@ public class DetailItem {
         this.screenshots = screenshots;
         this.movies = movies;
         this.mp4Urls = mp4Urls;
+        this.steamAppId = steamAppId;
     }
 
     public String getType() {
@@ -290,5 +292,13 @@ public class DetailItem {
 
     public void setMp4Urls(Map<String, String> mp4Urls) {
         this.mp4Urls = mp4Urls;
+    }
+
+    public int getSteamAppId() {
+        return steamAppId;
+    }
+
+    public void setSteamAppId(int steamAppId) {
+        this.steamAppId = steamAppId;
     }
 }

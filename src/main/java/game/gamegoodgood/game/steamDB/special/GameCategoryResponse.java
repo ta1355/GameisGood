@@ -1,9 +1,6 @@
-package game.gamegoodgood.game.steamDB;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package game.gamegoodgood.game.steamDB.special;
 
 import java.util.List;
-import java.util.Map;
 
 public class GameCategoryResponse {
 

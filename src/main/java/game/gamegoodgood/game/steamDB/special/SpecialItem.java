@@ -1,4 +1,4 @@
-package game.gamegoodgood.game.steamDB;
+package game.gamegoodgood.game.steamDB.special;
 
 public class SpecialItem {
     private int id;

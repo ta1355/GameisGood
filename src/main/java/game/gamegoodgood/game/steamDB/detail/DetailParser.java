@@ -1,4 +1,4 @@
-package game.gamegoodgood.game.steamDB;
+package game.gamegoodgood.game.steamDB.detail;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -113,7 +113,8 @@ public class DetailParser {
                 itemJson.optString("background", ""),
                 screenshots,
                 movies,
-                mp4Urls
+                mp4Urls,
+                itemJson.getInt("steam_appid")
         );
     }
 

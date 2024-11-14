@@ -1,10 +1,12 @@
 package game.gamegoodgood.game.steamDB;
 
+import game.gamegoodgood.game.steamDB.detail.DetailItem;
+import game.gamegoodgood.game.steamDB.search.SteamAppSearch;
+import game.gamegoodgood.game.steamDB.special.GameCategoryResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class SteamDBController {
@@ -19,7 +21,7 @@ public class SteamDBController {
     @GetMapping("/test")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<GameCategoryResponse> findSteamDB() {
-        GameCategoryResponse response = steamDBAPIService.findSteamAPI();
+        GameCategoryResponse response = steamDBAPIService.findSpecial();
         return ResponseEntity.ok(response);
     }
 
@@ -30,6 +32,17 @@ public class SteamDBController {
         return ResponseEntity.ok(item);
     }
 
+    @GetMapping("/search/{search}")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<List<SteamAppSearch>> searchApp(@PathVariable String search) {
+        List<SteamAppSearch> steamAppSearchList = steamDBAPIService.steamAppSearch(search);
+
+        if (steamAppSearchList == null || steamAppSearchList.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+
+        return ResponseEntity.ok(steamAppSearchList);
+    }
 
 
 
