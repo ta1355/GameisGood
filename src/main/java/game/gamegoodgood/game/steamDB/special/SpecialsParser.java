@@ -2,6 +2,7 @@ package game.gamegoodgood.game.steamDB.special;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +10,11 @@ import java.util.List;
 public class SpecialsParser {
 
 
-    public GameCategoryResponse parse(String jsonResponse) {
+    public GameCategoryResponse parse(String url) {
         List<SpecialItem> specials = new ArrayList<>();
+        RestTemplate restTemplate = new RestTemplate();
         try {
+            String jsonResponse = restTemplate.getForObject(url, String.class);
             JSONObject jsonObject = new JSONObject(jsonResponse);
 
             if (jsonObject.has("specials")) {
