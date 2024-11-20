@@ -14,13 +14,19 @@ import java.util.List;
 
 @Service
 public class SteamDBAPIService {
+    private final String apiUrl = "https://store.steampowered.com/api/featuredcategories?cc=KR&l=korean";
     private final SpecialsParser specialsParser = new SpecialsParser();
     private final DetailParser detailParser = new DetailParser();
     private final SteamAppSearchParser steamAppSearchParser = new SteamAppSearchParser();
 
     public GameCategoryResponse findSpecial() {
-        String url = "https://store.steampowered.com/api/featuredcategories?cc=KR&l=korean";
-        return specialsParser.parse(url);
+        String jsonResponse = fetchDataFromApi();
+        return specialsParser.parse(jsonResponse);
+    }
+
+    private String fetchDataFromApi() {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject(apiUrl, String.class);
     }
 
     public DetailItem findDetail(Long id) {
@@ -32,6 +38,7 @@ public class SteamDBAPIService {
     public List<SteamAppSearch> steamAppSearch(String search) {
         String url = "https://steamcommunity.com/actions/SearchApps/" + search;
         System.out.println("url 확인용: " + url);
+        // Parser가 반환하는 값이 List<SteamAppSearch>로 변경되었으므로, 반환 타입도 List<SteamAppSearch>로 수정
         return steamAppSearchParser.searchResponse(url);
     }
 }
