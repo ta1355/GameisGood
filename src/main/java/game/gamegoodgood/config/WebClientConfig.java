@@ -1,4 +1,4 @@
-package game.gamegoodgood.webClientBean;
+package game.gamegoodgood.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,4 +11,6 @@ public class WebClientConfig {
     public WebClient webClient(){
         return  WebClient.builder().build();
     }
+
+
 }

@@ -18,7 +18,12 @@ public class postSerivce {
     }
 
     public Post savePost(PostDto dto) {
-        Post post = new Post(dto.title(), dto.detail(), dto.game());
+        String image = dto.image();
+
+        if (image == null || image.isEmpty()) {
+            image = null;
+        }
+        Post post = new Post(dto.title(), dto.detail(), dto.game(), image);
         return postRepository.save(post);
     }
 

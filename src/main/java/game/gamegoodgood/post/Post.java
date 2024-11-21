@@ -3,6 +3,7 @@ package game.gamegoodgood.post;
 import game.gamegoodgood.comment.Comment;
 import game.gamegoodgood.user.Users;
 import jakarta.persistence.*;
+import org.springframework.lang.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ public class Post {
 
     private String Game;
 
+    @Nullable
+    private String image;
+
     @ManyToOne
     private Users users;
 
@@ -41,7 +45,14 @@ public class Post {
     public Post(String title, String detail, String game) {
         this.title = title;
         this.detail = detail;
-        Game = game;
+        this.Game = game;
+    }
+
+    public Post(String title, String detail, String game, String image) {
+        this.title = title;
+        this.detail = detail;
+        this.Game = game;
+        this.image = image;
     }
 
     public Long getId() {
@@ -66,6 +77,66 @@ public class Post {
 
     public LocalDateTime getDeletedDateTime() {
         return deletedDateTime;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public void setCreateDateTime(LocalDateTime createDateTime) {
+        this.createDateTime = createDateTime;
+    }
+
+    public void setDeletedDateTime(LocalDateTime deletedDateTime) {
+        this.deletedDateTime = deletedDateTime;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public String getGame() {
+        return Game;
+    }
+
+    public void setGame(String game) {
+        Game = game;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Users getUsers() {
+        return users;
+    }
+
+    public void setUsers(Users users) {
+        this.users = users;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public int getLikeCount() {

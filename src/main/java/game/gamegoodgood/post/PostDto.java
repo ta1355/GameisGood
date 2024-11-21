@@ -3,6 +3,7 @@ package game.gamegoodgood.post;
 public record PostDto(
         String title,
         String detail,
-        String game
+        String game,
+        String image
 ) {
 }
