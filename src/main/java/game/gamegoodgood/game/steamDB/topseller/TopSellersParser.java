@@ -1,21 +1,22 @@
-package game.gamegoodgood.game.steamDB.special;
+package game.gamegoodgood.game.steamDB.topseller;
 
+import game.gamegoodgood.game.steamDB.special.GameCategoryResponse;
+import game.gamegoodgood.game.steamDB.special.SteamItem;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpecialsParser {
-
+public class TopSellersParser {
 
     public GameCategoryResponse parse(String jsonResponse) {
         List<SteamItem> specials = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(jsonResponse);
 
-            if (jsonObject.has("specials")) {
-                JSONObject specialsJson = jsonObject.getJSONObject("specials");
+            if (jsonObject.has("top_sellers")) {
+                JSONObject specialsJson = jsonObject.getJSONObject("top_sellers");
                 specials = parseItems(specialsJson.getJSONArray("items"));
                 return new GameCategoryResponse(specials);
             }else {
@@ -32,14 +33,14 @@ public class SpecialsParser {
         List<SteamItem> specials = new ArrayList<>();
         for (int i = 0; i < itemsJson.length(); i++) {
             JSONObject itemJson = itemsJson.getJSONObject(i);
-            SteamItem steamItem = parseSpecialItem(itemJson);
+            SteamItem steamItem = parseTopSellersItem(itemJson);
             specials.add(steamItem);
         }
         return specials;
     }
 
 
-    private SteamItem parseSpecialItem(JSONObject itemJson) {
+    private SteamItem parseTopSellersItem(JSONObject itemJson) {
         return new SteamItem(
                 itemJson.getInt("id"),
                 itemJson.getString("name"),

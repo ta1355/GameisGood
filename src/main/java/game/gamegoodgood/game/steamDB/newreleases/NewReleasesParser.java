@@ -1,21 +1,22 @@
-package game.gamegoodgood.game.steamDB.special;
+package game.gamegoodgood.game.steamDB.newreleases;
 
+import game.gamegoodgood.game.steamDB.special.GameCategoryResponse;
+import game.gamegoodgood.game.steamDB.special.SteamItem;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpecialsParser {
-
+public class NewReleasesParser {
 
     public GameCategoryResponse parse(String jsonResponse) {
         List<SteamItem> specials = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(jsonResponse);
 
-            if (jsonObject.has("specials")) {
-                JSONObject specialsJson = jsonObject.getJSONObject("specials");
+            if (jsonObject.has("new_releases")) {
+                JSONObject specialsJson = jsonObject.getJSONObject("new_releases");
                 specials = parseItems(specialsJson.getJSONArray("items"));
                 return new GameCategoryResponse(specials);
             }else {
@@ -32,20 +33,20 @@ public class SpecialsParser {
         List<SteamItem> specials = new ArrayList<>();
         for (int i = 0; i < itemsJson.length(); i++) {
             JSONObject itemJson = itemsJson.getJSONObject(i);
-            SteamItem steamItem = parseSpecialItem(itemJson);
+            SteamItem steamItem = parseTopSellersItem(itemJson);
             specials.add(steamItem);
         }
         return specials;
     }
 
 
-    private SteamItem parseSpecialItem(JSONObject itemJson) {
+    private SteamItem parseTopSellersItem(JSONObject itemJson) {
         return new SteamItem(
                 itemJson.getInt("id"),
                 itemJson.getString("name"),
                 itemJson.getBoolean("discounted"),
                 itemJson.optInt("discount_percent", 0),
-                itemJson.getInt("original_price"),
+                itemJson.optInt("original_price", 0),
                 itemJson.getInt("final_price"),
                 itemJson.getString("currency"),
                 itemJson.optString("large_capsule_image", null),

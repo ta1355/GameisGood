@@ -5,18 +5,18 @@ import java.util.List;
 public class GameCategoryResponse {
 
 
-    private List<SpecialItem> specials;
+    private List<SteamItem> specials;
 
 
-    public GameCategoryResponse(List<SpecialItem> specials) {
+    public GameCategoryResponse(List<SteamItem> specials) {
         this.specials = specials;
     }
 
-    public List<SpecialItem> getSpecials() {
+    public List<SteamItem> getSpecials() {
         return specials;
     }
 
-    public void setSpecials(List<SpecialItem> specials) {
+    public void setSpecials(List<SteamItem> specials) {
         this.specials = specials;
     }
 

@@ -18,14 +18,37 @@ public class SteamDBController {
     }
 
 
-    @GetMapping("/test")
+    @GetMapping("/game/specials")
     @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<GameCategoryResponse> findSteamDB() {
+    public ResponseEntity<GameCategoryResponse> findSpecials() {
         GameCategoryResponse response = steamDBAPIService.findSpecial();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/test/{id}")
+    @GetMapping("/game/top_sellers")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<GameCategoryResponse> findTopSellers() {
+        GameCategoryResponse response = steamDBAPIService.findTopSellers();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/game/coming_soon")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<GameCategoryResponse> findComingSoon() {
+        GameCategoryResponse response = steamDBAPIService.findComingSoon();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/game/new_releases")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public ResponseEntity<GameCategoryResponse> findNewReleases() {
+        GameCategoryResponse response = steamDBAPIService.findNewReleases();
+        return ResponseEntity.ok(response);
+    }
+
+
+
+    @GetMapping("/game/{id}")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<DetailItem> findDetail(@PathVariable Long id) {
         DetailItem item = steamDBAPIService.findDetail(id);
