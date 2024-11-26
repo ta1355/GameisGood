@@ -46,8 +46,6 @@ public class SteamDBController {
         return ResponseEntity.ok(response);
     }
 
-
-
     @GetMapping("/game/{id}")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<DetailItem> findDetail(@PathVariable Long id) {
