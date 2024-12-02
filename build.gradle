@@ -39,7 +39,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'javax.xml.bind:jaxb-api:2.3.1' // JAXB API
 	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1' // JAXB Runtime
-	implementation 'org.json:json:20210307' //org.json
+	implementation 'org.json:json:20231013' //org.json
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	implementation 'io.jsonwebtoken:jjwt:0.11.5'
+//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {
