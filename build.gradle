@@ -39,10 +39,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'javax.xml.bind:jaxb-api:2.3.1' // JAXB API
 	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1' // JAXB Runtime
-	implementation 'org.json:json:20231013' //org.json
+	implementation 'org.json:json:20231013' // org.json
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-//	implementation 'io.jsonwebtoken:jjwt:0.11.5'
-//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+
+	// Validation Starter
+	implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final' // Hibernate Validator
+	implementation 'jakarta.validation:jakarta.validation-api:3.0.0' // Jakarta Validation API (Spring Boot 3.x 이상에서 필요)
 }
 
 tasks.named('test') {
