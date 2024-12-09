@@ -41,7 +41,10 @@ dependencies {
 	implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1' // JAXB Runtime
 	implementation 'org.json:json:20231013' // org.json
 	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'    // API 의존성
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'   // 구현체 의존성
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5' // Jackson 의존성 (optional, JSON 처리용)
+	implementation 'org.springframework.security:spring-security-oauth2-client'
 
 	// Validation Starter
 	implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final' // Hibernate Validator

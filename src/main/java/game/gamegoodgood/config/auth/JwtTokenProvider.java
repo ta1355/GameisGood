@@ -1,39 +1,75 @@
 package game.gamegoodgood.config.auth;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys; // 추가
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey; // 추가
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String JWT_SECRET = "yourSecretKey";  // JWT 서명에 사용할 비밀 키
+    private final SecretKey secretKey;
     private final long JWT_EXPIRATION = 86400000L;  // 토큰 만료 시간 (24시간)
     private final UserDetailsService userDetailsService;
 
     public JwtTokenProvider(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
+
+        // 안전한 512비트 비밀 키 생성
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);  // HS512에 적합한 512비트 키 생성
     }
 
-    // JWT 토큰 생성
+    // 기존의 generateToken 메서드 수정
     public String generateToken(Authentication authentication) {
+        String username;
+
+        // OAuth2 인증 (예: 구글 로그인 등)
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
+            OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
+
+            // OAuth2 사용자 이메일을 username으로 사용
+            username = oAuth2User.getAttribute("email");  // 이메일을 토큰의 주체로 사용
+        } else {
+            // 일반 로그인 (UsernamePasswordAuthenticationToken)
+            username = authentication.getName();
+        }
+
+        // JWT 토큰 생성
         return Jwts.builder()
-                .setSubject(authentication.getName())  // 토큰의 주체(사용자)
+                .setSubject(username)  // 토큰의 주체(사용자)
                 .setIssuedAt(new Date())  // 토큰 발급 시간
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))  // 만료 시간
-                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)  // 서명 방식
+                .signWith(secretKey)  // 안전한 비밀 키로 서명
+                .compact();
+    }
+
+    // generateTokenFromUserInfo 메서드 추가
+    public String generateTokenFromUserInfo(Map<String, Object> userInfo) {
+        String username = (String) userInfo.get("email");  // 사용자 정보에서 이메일을 username으로 사용
+
+        // JWT 토큰 생성
+        return Jwts.builder()
+                .setSubject(username)  // 토큰의 주체(사용자)
+                .setIssuedAt(new Date())  // 토큰 발급 시간
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))  // 만료 시간
+                .signWith(secretKey)  // 안전한 비밀 키로 서명
                 .compact();
     }
 
     // JWT 토큰에서 사용자 이름 (주체) 추출
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(JWT_SECRET)
+                .setSigningKey(secretKey)  // 안전한 비밀 키로 토큰 검증
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
@@ -43,7 +79,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(JWT_SECRET)
+                    .setSigningKey(secretKey)  // 안전한 비밀 키로 토큰 검증
                     .parseClaimsJws(token);
             return true;
         } catch (SignatureException | MalformedJwtException | ExpiredJwtException | UnsupportedJwtException | IllegalArgumentException e) {
@@ -55,6 +91,8 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         String username = getUsernameFromToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);  // UserDetailsService 사용
+
+        // 일반 사용자와 OAuth2 사용자를 구분하여 Authentication 객체 생성
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

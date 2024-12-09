@@ -1,5 +1,7 @@
 package game.gamegoodgood.user;
 
+import game.gamegoodgood.config.auth.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +13,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 public class UsersController {
@@ -24,11 +29,13 @@ public class UsersController {
     private final AuthenticationManager authenticationManager;
     private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public UsersController(UsersService usersService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+    public UsersController(UsersService usersService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.usersService = usersService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     // 사용자 생성
@@ -71,7 +78,11 @@ public class UsersController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.info("로그인 성공: 사용자 '{}' 인증 완료", loginRequest.getUsername());
 
-            return ResponseEntity.ok("로그인 성공");
+            // JWT 토큰 생성
+            String token = jwtTokenProvider.generateToken(authentication);
+
+            // JWT 토큰을 포함한 응답
+            return ResponseEntity.ok(new JwtResponse(token));  // JwtResponse 객체 반환
 
         } catch (UsernameNotFoundException ex) {
             // 사용자 없을 때 예외 처리
