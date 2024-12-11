@@ -52,6 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            System.out.println("Found JWT Token: " + bearerToken); // 로그 추가
             return bearerToken.substring(7);  // "Bearer " 이후의 토큰만 반환
         }
         return null;

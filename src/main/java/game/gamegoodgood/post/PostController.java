@@ -23,7 +23,6 @@ public class PostController {
 
     //아이디로 찾기
     @GetMapping("/post/{id}")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Post> findPostById(@PathVariable Long id) {
         Post byId = postSerivce.findById(id);
         if (byId != null) {
@@ -35,7 +34,6 @@ public class PostController {
 
     //전체 찾기
     @GetMapping("/post")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<List<Post>> findPostAll() {
        List<Post> posts =postSerivce.findAll();
        if (!posts.isEmpty()){
@@ -47,7 +45,6 @@ public class PostController {
 
     //게시글 만들기
     @PostMapping("/createpost")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Post> create(
             @RequestParam("title") String title,
             @RequestParam("detail") String detail,
@@ -80,7 +77,6 @@ public class PostController {
 
     //게시글 좋아요
     @PostMapping("/postlike/{id}")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Void> likePost(@PathVariable Long id) {
         postSerivce.likePost(id);  // 좋아요 처리
         return ResponseEntity.ok().build();
@@ -88,7 +84,6 @@ public class PostController {
 
     //게시글 삭제
     @DeleteMapping("postdelete/{id}")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Void> deletePost(@PathVariable Long id){
         postSerivce.deletedPost(id);
         return ResponseEntity.ok().build();
