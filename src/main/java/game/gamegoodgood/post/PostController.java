@@ -12,40 +12,39 @@ import java.util.List;
 @RestController
 public class PostController {
 
-    private final game.gamegoodgood.post.postSerivce postSerivce;
-
+    private final postService postService;
     private final FileUploadService fileUploadService;
 
-    public PostController(game.gamegoodgood.post.postSerivce postSerivce, FileUploadService fileUploadService) {
-        this.postSerivce = postSerivce;
+    public PostController(postService postService, FileUploadService fileUploadService) {
+        this.postService = postService;
         this.fileUploadService = fileUploadService;
     }
 
-    //아이디로 찾기
+    // 아이디로 찾기 (PostWithUserDto 반환)
     @GetMapping("/post/{id}")
-    public ResponseEntity<Post> findPostById(@PathVariable Long id) {
-        Post byId = postSerivce.findById(id);
-        if (byId != null) {
-            return ResponseEntity.ok(byId);  // 값이 있으면 200 OK
+    public ResponseEntity<PostWithUserDto> findPostById(@PathVariable Long id) {
+        PostWithUserDto postDto = postService.findById(id);
+        if (postDto != null) {
+            return ResponseEntity.ok(postDto);  // 값이 있으면 200 OK
         } else {
             return ResponseEntity.notFound().build();  // 값이 없으면 404 Not Found
         }
     }
 
-    //전체 찾기
+    // 전체 찾기 (PostWithUserDto 리스트 반환)
     @GetMapping("/post")
-    public ResponseEntity<List<Post>> findPostAll() {
-       List<Post> posts =postSerivce.findAll();
-       if (!posts.isEmpty()){
-           return ResponseEntity.ok(posts);
-       }else {
-           return ResponseEntity.noContent().build();
-       }
+    public ResponseEntity<List<PostWithUserDto>> findPostAll() {
+        List<PostWithUserDto> posts = postService.findAll();
+        if (!posts.isEmpty()) {
+            return ResponseEntity.ok(posts);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
-    //게시글 만들기
+    // 게시글 만들기 (PostWithUserDto 반환)
     @PostMapping("/createpost")
-    public ResponseEntity<Post> create(
+    public ResponseEntity<PostWithUserDto> create(
             @RequestParam("title") String title,
             @RequestParam("detail") String detail,
             @RequestParam("game") String game,
@@ -67,25 +66,25 @@ public class PostController {
         PostDto dto = new PostDto(title, detail, game, imagePath);
 
         // 게시글 저장
-        Post createPost = postSerivce.savePost(dto);
+        PostWithUserDto createPost = postService.savePost(dto);
 
         // 저장된 게시글 위치 URI 반환
-        URI location = URI.create("/posts/" + createPost.getId());
+        URI location = URI.create("/posts/" + createPost.id());
 
         return ResponseEntity.created(location).body(createPost);
     }
 
-    //게시글 좋아요
+    // 게시글 좋아요
     @PostMapping("/postlike/{id}")
     public ResponseEntity<Void> likePost(@PathVariable Long id) {
-        postSerivce.likePost(id);  // 좋아요 처리
+        postService.likePost(id);  // 좋아요 처리
         return ResponseEntity.ok().build();
     }
 
-    //게시글 삭제
+    // 게시글 삭제
     @DeleteMapping("postdelete/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id){
-        postSerivce.deletedPost(id);
+        postService.deletedPost(id);
         return ResponseEntity.ok().build();
     }
 }

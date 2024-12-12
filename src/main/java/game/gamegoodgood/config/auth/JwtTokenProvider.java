@@ -78,8 +78,9 @@ public class JwtTokenProvider {
     // JWT 토큰의 유효성 검사
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
+            Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)  // 안전한 비밀 키로 토큰 검증
+                    .build()
                     .parseClaimsJws(token);
             return true;
         } catch (SignatureException | MalformedJwtException | ExpiredJwtException | UnsupportedJwtException | IllegalArgumentException e) {

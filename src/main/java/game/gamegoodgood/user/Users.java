@@ -1,5 +1,6 @@
 package game.gamegoodgood.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import game.gamegoodgood.comment.Comment;
 import game.gamegoodgood.post.Post;
 import jakarta.persistence.*;
@@ -43,6 +44,7 @@ public class Users implements UserDetails {
     private LocalDateTime DeletedDateTime;
 
     @OneToMany(mappedBy = "users")
+    @JsonBackReference  // 'User'는 'Post'를 직렬화에서 제외하도록 설정
     private List<Post> posts = new ArrayList<>();
 
     @OneToMany(mappedBy = "users")

@@ -1,5 +1,6 @@
 package game.gamegoodgood.post;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import game.gamegoodgood.comment.Comment;
 import game.gamegoodgood.user.Users;
 import jakarta.persistence.*;
@@ -26,14 +27,16 @@ public class Post {
 
     private LocalDateTime deletedDateTime;
 
-    private int likeCount;
+    private int likeCount = 0;
 
-    private String Game;
+    private String game;
 
     @Nullable
     private String image;
 
     @ManyToOne
+    @JsonManagedReference
+    @JoinColumn(name = "index_id")
     private Users users;
 
     @OneToMany(mappedBy = "post")
@@ -45,13 +48,13 @@ public class Post {
     public Post(String title, String detail, String game) {
         this.title = title;
         this.detail = detail;
-        this.Game = game;
+        this.game = game;
     }
 
     public Post(String title, String detail, String game, String image) {
         this.title = title;
         this.detail = detail;
-        this.Game = game;
+        this.game = game;
         this.image = image;
     }
 
@@ -108,11 +111,11 @@ public class Post {
     }
 
     public String getGame() {
-        return Game;
+        return game;
     }
 
     public void setGame(String game) {
-        Game = game;
+        game = game;
     }
 
     public String getImage() {
