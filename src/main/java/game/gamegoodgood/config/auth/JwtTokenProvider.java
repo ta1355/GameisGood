@@ -96,4 +96,6 @@ public class JwtTokenProvider {
         // 일반 사용자와 OAuth2 사용자를 구분하여 Authentication 객체 생성
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
+
+
 }

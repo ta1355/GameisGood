@@ -68,7 +68,7 @@ public class postService {
         );
     }
 
-    // 게시글 조회 메서드 (username 포함)
+    // 게시글 조회 메서드
     public PostWithUserDto findById(Long id) {
         Post post = postRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));

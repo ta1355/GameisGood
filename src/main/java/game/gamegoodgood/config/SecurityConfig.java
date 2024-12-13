@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/**").permitAll()
                 .requestMatchers("/post/create").authenticated()
+                .requestMatchers("/posts/**/comments").authenticated()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)  // JWT 필터 설정
                 .oauth2Login()

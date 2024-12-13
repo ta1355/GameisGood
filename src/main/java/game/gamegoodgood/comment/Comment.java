@@ -1,5 +1,6 @@
 package game.gamegoodgood.comment;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import game.gamegoodgood.post.Post;
 import game.gamegoodgood.user.Users;
 import jakarta.persistence.*;
@@ -16,6 +17,8 @@ public class Comment {
     private String detail;
 
     @ManyToOne
+    @JoinColumn(name = "post_id")
+    @JsonBackReference // 순환 참조 방지
     private Post post;
 
     @ManyToOne
@@ -30,7 +33,9 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(String detail) {
+    public Comment(Users users, Post post, String detail) {
+        this.users = users;
+        this.post = post;
         this.detail = detail;
     }
 
@@ -94,4 +99,10 @@ public class Comment {
         this.deleted =true;
         deletedDAteTime=LocalDateTime.now();
     }
+
+    public String getUsername() {
+        return users != null ? users.getUsername() : null;
+    }
+
+
 }

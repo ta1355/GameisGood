@@ -40,6 +40,7 @@ public class Post {
     private Users users;
 
     @OneToMany(mappedBy = "post")
+    @JsonManagedReference
     private List<Comment> comments = new ArrayList<>();
 
     public Post() {
