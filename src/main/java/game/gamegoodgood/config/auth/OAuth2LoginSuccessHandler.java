@@ -39,8 +39,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setHeader("Authorization", "Bearer " + jwtToken);
 
         // 리디렉션 URL 설정 (로그인 후 사용자가 이동할 곳)
-        String redirectUri = UriComponentsBuilder.fromUriString("https://localhost:3000")  // React 앱 주소
-                .path("/login/oauth2/code/google") // 구글 로그인 후 리디렉션될 페이지
+        String redirectUri = UriComponentsBuilder.fromUriString("http://localhost:3000/login")  // React 앱의 로그인 페이지
                 .queryParam("token", jwtToken)  // JWT 토큰을 쿼리 파라미터로 전달
                 .build()
                 .toUriString();
