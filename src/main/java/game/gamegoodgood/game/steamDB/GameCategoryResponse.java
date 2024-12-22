@@ -1,4 +1,6 @@
-package game.gamegoodgood.game.steamDB.special;
+package game.gamegoodgood.game.steamDB;
+
+import game.gamegoodgood.game.steamDB.detail.SteamItem;
 
 import java.util.List;
 

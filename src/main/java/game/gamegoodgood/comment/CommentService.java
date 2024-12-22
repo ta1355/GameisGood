@@ -24,7 +24,6 @@ public class CommentService {
 
     // 댓글 생성
     public Comment createComment(Post post, String detail, Users user) {
-        // 댓글 생성
         Comment comment = new Comment(user, post, detail);
         return commentRepository.save(comment); // 댓글을 저장 후 반환
     }

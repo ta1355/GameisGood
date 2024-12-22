@@ -1,15 +1,9 @@
 package game.gamegoodgood.game.steamDB;
 
-
-import game.gamegoodgood.game.steamDB.comingsoon.ComingSoonParser;
 import game.gamegoodgood.game.steamDB.detail.DetailItem;
 import game.gamegoodgood.game.steamDB.detail.DetailParser;
-import game.gamegoodgood.game.steamDB.newreleases.NewReleasesParser;
 import game.gamegoodgood.game.steamDB.search.SteamAppSearch;
 import game.gamegoodgood.game.steamDB.search.SteamAppSearchParser;
-import game.gamegoodgood.game.steamDB.special.GameCategoryResponse;
-import game.gamegoodgood.game.steamDB.special.SpecialsParser;
-import game.gamegoodgood.game.steamDB.topseller.TopSellersParser;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -17,48 +11,53 @@ import java.util.List;
 
 @Service
 public class SteamDBAPIService {
-    private final String apiUrl = "https://store.steampowered.com/api/featuredcategories?cc=KR&l=korean";
-    private final SpecialsParser specialsParser = new SpecialsParser();
-    private final TopSellersParser topSellersParser = new TopSellersParser();
-    private final ComingSoonParser comingSoonParser = new ComingSoonParser();
-    private final NewReleasesParser newReleasesParser = new NewReleasesParser();
-    private final DetailParser detailParser = new DetailParser();
-    private final SteamAppSearchParser steamAppSearchParser = new SteamAppSearchParser();
+    private final String featuredCategoriesUrl = "https://store.steampowered.com/api/featuredcategories?cc=KR&l=korean";
+    private final String appDetailsUrl = "https://store.steampowered.com/api/appdetails?appids=%s&cc=KR&l=korean";
+    private final String searchUrl = "https://steamcommunity.com/actions/SearchApps/";
+    private final GenericSteamParser parser;
+    private final RestTemplate restTemplate;
+    private final DetailParser detailParser;
+    private final SteamAppSearchParser searchParser;
+
+    public SteamDBAPIService(GenericSteamParser parser, RestTemplate restTemplate,
+                             DetailParser detailParser, SteamAppSearchParser searchParser) {
+        this.parser = parser;
+        this.restTemplate = restTemplate;
+        this.detailParser = detailParser;
+        this.searchParser = searchParser;
+    }
 
     public GameCategoryResponse findSpecial() {
-        String jsonResponse = fetchDataFromApi();
-        return specialsParser.parse(jsonResponse);
+        String jsonResponse = fetchDataFromApi(featuredCategoriesUrl);
+        return parser.parseCategory(jsonResponse, "specials");
     }
 
-    public GameCategoryResponse findTopSellers(){
-        String jsonResponse = fetchDataFromApi();
-        return topSellersParser.parse(jsonResponse);
+    public GameCategoryResponse findTopSellers() {
+        String jsonResponse = fetchDataFromApi(featuredCategoriesUrl);
+        return parser.parseCategory(jsonResponse, "top_sellers");
     }
 
-    public GameCategoryResponse findComingSoon(){
-        String jsonResponse = fetchDataFromApi();
-        return comingSoonParser.parse(jsonResponse);
+    public GameCategoryResponse findComingSoon() {
+        String jsonResponse = fetchDataFromApi(featuredCategoriesUrl);
+        return parser.parseCategory(jsonResponse, "coming_soon");
     }
 
-    public GameCategoryResponse findNewReleases(){
-        String jsonResponse = fetchDataFromApi();
-        return newReleasesParser.parse(jsonResponse);
-    }
-
-    private String fetchDataFromApi() {
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.getForObject(apiUrl, String.class);
+    public GameCategoryResponse findNewReleases() {
+        String jsonResponse = fetchDataFromApi(featuredCategoriesUrl);
+        return parser.parseCategory(jsonResponse, "new_releases");
     }
 
     public DetailItem findDetail(Long id) {
-        String url = "https://store.steampowered.com/api/appdetails?appids="+id+"&cc=KR&l=korean";
-        System.out.println("url 확인용: " +url);
+        String url = String.format(appDetailsUrl, id);
         return detailParser.detailResponse(url);
     }
 
     public List<SteamAppSearch> steamAppSearch(String search) {
-        String url = "https://steamcommunity.com/actions/SearchApps/" + search;
-        System.out.println("url 확인용: " + url);
-        return steamAppSearchParser.searchResponse(url);
+        String url = searchUrl + search;
+        return searchParser.searchResponse(url);
+    }
+
+    private String fetchDataFromApi(String url) {
+        return restTemplate.getForObject(url, String.class);
     }
 }

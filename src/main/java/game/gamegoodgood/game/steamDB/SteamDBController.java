@@ -2,7 +2,6 @@ package game.gamegoodgood.game.steamDB;
 
 import game.gamegoodgood.game.steamDB.detail.DetailItem;
 import game.gamegoodgood.game.steamDB.search.SteamAppSearch;
-import game.gamegoodgood.game.steamDB.special.GameCategoryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

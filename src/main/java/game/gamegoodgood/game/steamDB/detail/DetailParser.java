@@ -2,6 +2,7 @@ package game.gamegoodgood.game.steamDB.detail;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class DetailParser {
 
     private Long extractIdFromUrl(String url) {
@@ -80,7 +82,7 @@ public class DetailParser {
         List<String> developers = jsonArrayToList(itemJson.optJSONArray("developers"));
         List<String> publishers = jsonArrayToList(itemJson.optJSONArray("publishers"));
         List<String> screenshots = jsonArrayToScreenshotUrls(itemJson.optJSONArray("screenshots"));
-        List<String> movies = jsonArrayToMovies(itemJson.optJSONArray("movies")); // 수정된 부분
+        List<String> movies = jsonArrayToMovies(itemJson.optJSONArray("movies"));
 
         // HTML 태그를 제거하는 메서드 호출
         String detailedDescription = removeHtmlTags(itemJson.getString("detailed_description"));
