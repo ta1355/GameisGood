@@ -1,5 +1,8 @@
 package game.gamegoodgood.post;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +36,13 @@ public class PostController {
 
     // 전체 찾기 (PostWithUserDto 리스트 반환)
     @GetMapping("/post")
-    public ResponseEntity<List<PostWithUserDto>> findPostAll() {
-        List<PostWithUserDto> posts = postService.findAll();
-        if (!posts.isEmpty()) {
-            return ResponseEntity.ok(posts);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+    public ResponseEntity<Page<PostWithUserDto>> findPostAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PostWithUserDto> posts = postService.findAll(pageable);
+        return ResponseEntity.ok(posts);
     }
 
     // 게시글 만들기 (PostWithUserDto 반환)
