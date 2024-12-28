@@ -11,7 +11,7 @@ public record PostWithUserDto(
         String username,
         LocalDateTime createDateTime,
         LocalDateTime deletedDateTime,
-        Integer likeCount
-
+        Integer likeCount,
+        Integer viewCount
 ) {
 }

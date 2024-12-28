@@ -90,4 +90,11 @@ public class PostController {
         postService.deletedPost(id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/post/{id}/view")
+    public ResponseEntity<Void> incrementViewCount(@PathVariable Long id) {
+        postService.incrementViewCount(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

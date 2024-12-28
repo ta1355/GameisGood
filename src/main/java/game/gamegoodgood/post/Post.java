@@ -43,6 +43,8 @@ public class Post {
     @JsonManagedReference
     private List<Comment> comments = new ArrayList<>();
 
+    private int viewCount;
+
     public Post() {
     }
 
@@ -152,9 +154,19 @@ public class Post {
         this.deletedDateTime= LocalDateTime.now();
     }
 
-    public void like(){
+    public void incrementLikeCount(){
         likeCount+=1;
     }
 
+    public void incrementViewCount(){
+        this.viewCount++;
+    }
 
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
 }
