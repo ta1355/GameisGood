@@ -1,16 +1,20 @@
 package game.gamegoodgood.config.auth;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys; // 추가
+import io.jsonwebtoken.security.Keys;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey; // 추가
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
 
@@ -20,15 +24,17 @@ public class JwtTokenProvider {
     private final SecretKey secretKey;
     private final long JWT_EXPIRATION = 86400000L;  // 토큰 만료 시간 (24시간)
     private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
-    public JwtTokenProvider(UserDetailsService userDetailsService) {
+    public JwtTokenProvider(@Lazy UserDetailsService userDetailsService, @Lazy PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
 
         // 안전한 512비트 비밀 키 생성
         this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);  // HS512에 적합한 512비트 키 생성
     }
 
-    // 기존의 generateToken 메서드 수정
+    // 기존의 generateToken 메서드
     public String generateToken(Authentication authentication) {
         String username;
 
@@ -53,7 +59,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // generateTokenFromUserInfo 메서드 추가
+    // generateTokenFromUserInfo 메서드
     public String generateTokenFromUserInfo(Map<String, Object> userInfo) {
         String username = (String) userInfo.get("email");  // 사용자 정보에서 이메일을 username으로 사용
 
@@ -97,5 +103,15 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
-
+    public Authentication authenticateUser(String username, String password) {
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+                throw new BadCredentialsException("Invalid password");
+            }
+            return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        } catch (UsernameNotFoundException ex) {
+            throw new BadCredentialsException("Invalid username or password");
+        }
+    }
 }

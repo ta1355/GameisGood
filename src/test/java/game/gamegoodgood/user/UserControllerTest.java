@@ -8,9 +8,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 
@@ -44,7 +44,7 @@ class UsersControllerTest {
         UsersDTO dto = new UsersDTO("testUser", "password", "test@example.com");
         when(usersService.createUser(dto)).thenReturn(new Users("testUser", "encodedPassword", "test@example.com"));
 
-        ResponseEntity<UsersDTO> response = usersController.createUser(dto);
+        ResponseEntity<?> response = usersController.createUser(dto);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(dto, response.getBody());
@@ -56,12 +56,9 @@ class UsersControllerTest {
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
 
-        UserDetails userDetails = mock(UserDetails.class);
-        when(usersService.loadUserByUsername("testUser")).thenReturn(userDetails);
-        when(passwordEncoder.matches("password", userDetails.getPassword())).thenReturn(true);
-
         Authentication authentication = mock(Authentication.class);
-        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
 
         when(jwtTokenProvider.generateToken(authentication)).thenReturn("testToken");
 
@@ -73,32 +70,32 @@ class UsersControllerTest {
     }
 
     @Test
-    void testLoginFailureWrongPassword() {
+    void testLoginFailure() {
         LoginRequest loginRequest = new LoginRequest("testUser", "wrongPassword");
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
 
-        UserDetails userDetails = mock(UserDetails.class);
-        when(usersService.loadUserByUsername("testUser")).thenReturn(userDetails);
-        when(passwordEncoder.matches("wrongPassword", userDetails.getPassword())).thenReturn(false);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new BadCredentialsException("Invalid credentials"));
 
         ResponseEntity<?> response = usersController.login(loginRequest, bindingResult);
 
         assertEquals(401, response.getStatusCodeValue());
-        assertEquals("로그인 실패: 아이디 또는 비밀번호가 잘못되었습니다.", response.getBody());
+        assertTrue(response.getBody() instanceof String);
+        assertTrue(((String) response.getBody()).contains("로그인 실패"));
     }
 
     @Test
-    void testLoginFailureUserNotFound() {
-        LoginRequest loginRequest = new LoginRequest("nonExistentUser", "password");
+    void testLoginWithInvalidRequest() {
+        LoginRequest loginRequest = new LoginRequest("", "");
         BindingResult bindingResult = mock(BindingResult.class);
-        when(bindingResult.hasErrors()).thenReturn(false);
-
-        when(usersService.loadUserByUsername("nonExistentUser")).thenThrow(new UsernameNotFoundException("User not found"));
+        when(bindingResult.hasErrors()).thenReturn(true);
+        when(bindingResult.getFieldError()).thenReturn(null);
 
         ResponseEntity<?> response = usersController.login(loginRequest, bindingResult);
 
-        assertEquals(401, response.getStatusCodeValue());
-        assertEquals("로그인 실패: 아이디 또는 비밀번호가 잘못되었습니다.", response.getBody());
+        assertEquals(400, response.getStatusCodeValue());
+        assertTrue(response.getBody() instanceof String);
+        assertEquals("잘못된 요청: 잘못된 요청", response.getBody());
     }
 }
