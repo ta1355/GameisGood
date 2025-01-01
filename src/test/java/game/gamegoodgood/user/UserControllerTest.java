@@ -52,34 +52,45 @@ class UsersControllerTest {
 
     @Test
     void testLoginSuccess() {
+        // Given
         LoginRequest loginRequest = new LoginRequest("testUser", "password");
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
 
         Authentication authentication = mock(Authentication.class);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+        // authenticateUser 메서드에 대한 stub 추가
+        when(jwtTokenProvider.authenticateUser(loginRequest.getUsername(), loginRequest.getUserPassword()))
                 .thenReturn(authentication);
-
         when(jwtTokenProvider.generateToken(authentication)).thenReturn("testToken");
 
+        // When
         ResponseEntity<?> response = usersController.login(loginRequest, bindingResult);
 
+        // Then
         assertEquals(200, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof JwtResponse);
         assertEquals("testToken", ((JwtResponse) response.getBody()).getToken());
+
+        // 검증
+        verify(jwtTokenProvider).authenticateUser(loginRequest.getUsername(), loginRequest.getUserPassword());
+        verify(jwtTokenProvider).generateToken(authentication);
     }
 
     @Test
     void testLoginFailure() {
+        // Given
         LoginRequest loginRequest = new LoginRequest("testUser", "wrongPassword");
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+        // authenticateUser가 예외를 던지도록 설정
+        when(jwtTokenProvider.authenticateUser(loginRequest.getUsername(), loginRequest.getUserPassword()))
                 .thenThrow(new BadCredentialsException("Invalid credentials"));
 
+        // When
         ResponseEntity<?> response = usersController.login(loginRequest, bindingResult);
 
+        // Then
         assertEquals(401, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof String);
         assertTrue(((String) response.getBody()).contains("로그인 실패"));
