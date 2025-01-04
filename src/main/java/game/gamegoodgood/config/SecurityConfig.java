@@ -37,12 +37,8 @@ public class SecurityConfig {
         this.oAuth2LoginSuccessHandler = oAuth2LoginSuccessHandler;
     }
 
-
-
     @Bean
-
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .csrf().disable()
                 .cors().configurationSource(corsConfigurationSource())
@@ -59,6 +55,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/createpost").authenticated()
                         .requestMatchers(HttpMethod.POST, "/posts/{postId}/comments").authenticated()
                         .requestMatchers(HttpMethod.GET, "/posts/{postId}/comments").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/find-username").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/change-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/create").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/game/specials").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/game/top_sellers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/game/coming_soon").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/game/new_releases").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/game/{id}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/search/{search}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
@@ -67,13 +72,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
         return http.build();
-
     }
 
-
-
     @Bean
-
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
@@ -92,14 +93,10 @@ public class SecurityConfig {
         return source;
     }
 
-
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {

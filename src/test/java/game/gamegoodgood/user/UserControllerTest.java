@@ -108,4 +108,52 @@ class UsersControllerTest {
         assertTrue(response.getBody() instanceof String);
         assertEquals("잘못된 요청: 잘못된 요청", response.getBody());
     }
+
+    @Test
+    void testFindUsername() {
+        UserEmailRequest request = new UserEmailRequest("test@example.com");
+        when(usersService.findUsernameByEmail("test@example.com")).thenReturn("testUser");
+
+        ResponseEntity<String> response = usersController.findUsername(request);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("찾은 아이디: testUser", response.getBody());
+        verify(usersService).findUsernameByEmail("test@example.com");
+    }
+
+    @Test
+    void testFindUsernameNotFound() {
+        UserEmailRequest request = new UserEmailRequest("nonexistent@example.com");
+        when(usersService.findUsernameByEmail("nonexistent@example.com"))
+                .thenThrow(new RuntimeException("해당 이메일로 등록된 사용자를 찾을 수 없습니다."));
+
+        ResponseEntity<String> response = usersController.findUsername(request);
+
+        assertEquals(404, response.getStatusCodeValue());
+        assertEquals("해당 이메일로 등록된 사용자를 찾을 수 없습니다.", response.getBody());
+    }
+
+    @Test
+    void testChangePasswordSuccess() {
+        PasswordChangeRequest request = new PasswordChangeRequest("testUser", "oldPassword", "newPassword");
+        doNothing().when(usersService).changePassword("testUser", "oldPassword", "newPassword");
+
+        ResponseEntity<String> response = usersController.changePassword(request);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("비밀번호가 성공적으로 변경되었습니다.", response.getBody());
+        verify(usersService).changePassword("testUser", "oldPassword", "newPassword");
+    }
+
+    @Test
+    void testChangePasswordFailure() {
+        PasswordChangeRequest request = new PasswordChangeRequest("testUser", "wrongPassword", "newPassword");
+        doThrow(new RuntimeException("현재 비밀번호가 일치하지 않습니다."))
+                .when(usersService).changePassword("testUser", "wrongPassword", "newPassword");
+
+        ResponseEntity<String> response = usersController.changePassword(request);
+
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("현재 비밀번호가 일치하지 않습니다.", response.getBody());
+    }
 }

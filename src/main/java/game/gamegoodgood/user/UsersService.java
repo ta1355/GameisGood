@@ -39,4 +39,25 @@ public class UsersService implements org.springframework.security.core.userdetai
         users.setRole("USER"); // 기본 역할 설정
         return userRepository.save(users);
     }
+
+    public String findUsernameByEmail(String email) {
+        return userRepository.findByUserEmail(email)
+                .map(Users::getUsername)
+                .orElseThrow(() -> new RuntimeException("해당 이메일로 등록된 사용자를 찾을 수 없습니다."));
+    }
+
+    public void changePassword(String username, String userEmail, String newPassword) {
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        if (!user.getUserEmail().equals(userEmail)) {
+            throw new RuntimeException("이메일 주소가 일치하지 않습니다.");
+        }
+
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        user.setUserPassword(encodedNewPassword);
+        userRepository.save(user);
+    }
+
+
 }

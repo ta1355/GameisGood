@@ -68,4 +68,28 @@ public class UsersController {
             return ResponseEntity.status(500).body("로그인 실패: " + e.getMessage());
         }
     }
+
+
+    // 아이디 찾기(userEmail 사용하여 검색)
+    @PostMapping("/user/find-username")
+    public ResponseEntity<String> findUsername(@RequestBody UserEmailRequest userEmailRequest) {
+        try {
+            String username = usersService.findUsernameByEmail(userEmailRequest.userEmail());
+            return ResponseEntity.ok("찾은 아이디: " + username);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
+
+    // 비밀번호 변경
+    @PostMapping("/user/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody PasswordChangeRequest request) {
+        try {
+            usersService.changePassword(request.username(), request.userEmail(), request.newPassword());
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
+
 }
