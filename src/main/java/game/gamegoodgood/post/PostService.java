@@ -16,20 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-public class postService {
+public class PostService {
 
-    private static final Logger log = LoggerFactory.getLogger(postService.class);
+    private static final Logger log = LoggerFactory.getLogger(PostService.class);
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
 
-    public postService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository) {
+    public PostService(PostRepository postRepository, UserRepository userRepository, LikeRepository likeRepository) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
         this.likeRepository = likeRepository;
     }
 
-    public PostWithUserDto savePost(PostDto dto) {
+    public PostWithUserDto savePost(PostDTO dto) {
         String image = dto.image();
         if (image == null || image.isEmpty()) {
             image = null;

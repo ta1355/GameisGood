@@ -20,7 +20,6 @@ public class UsersService implements org.springframework.security.core.userdetai
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 'Users' 객체는 이미 UserDetails를 구현하므로, User 클래스로 변환할 필요 없음
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }

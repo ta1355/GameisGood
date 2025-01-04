@@ -1,6 +1,6 @@
 package game.gamegoodgood.comment;
 
-import game.gamegoodgood.config.auth.JwtTokenProvider;
+import game.gamegoodgood.config.jwt.JwtTokenProvider;
 import game.gamegoodgood.post.Post;
 import game.gamegoodgood.post.PostRepository;
 import game.gamegoodgood.user.UserRepository;
@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,7 +29,7 @@ public class CommentController {
 
     // 댓글 생성
     @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<CommentDto> createComment(@PathVariable Long postId, @RequestBody CommentDto dto,
+    public ResponseEntity<CommentDTO> createComment(@PathVariable Long postId, @RequestBody CommentDTO dto,
                                                     @RequestHeader("Authorization") String token) {
         // JWT 토큰에서 사용자 정보 추출
         String username = extractUsernameFromToken(token);
@@ -51,7 +50,7 @@ public class CommentController {
         Comment comment = commentService.createComment(post, dto.detail(), user);
 
         // CommentDto로 변환하여 응답
-        CommentDto responseDto = new CommentDto(
+        CommentDTO responseDto = new CommentDTO(
                 comment.getIndexId(),
                 comment.getDetail(),
                 comment.getUsers().getUsername(),
@@ -64,7 +63,7 @@ public class CommentController {
 
     // 댓글 목록 조회 (특정 게시글에 대한 모든 댓글 조회)
     @GetMapping("/posts/{postId}/comments")
-    public ResponseEntity<List<CommentDto>> findAllByPostId(@PathVariable Long postId) {
+    public ResponseEntity<List<CommentDTO>> findAllByPostId(@PathVariable Long postId) {
         // 해당 postId에 맞는 Post 조회
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
@@ -73,8 +72,8 @@ public class CommentController {
         List<Comment> comments = commentService.findAllByPost(post);
 
         // 댓글 목록을 CommentDto 목록으로 변환
-        List<CommentDto> commentDtos = comments.stream()
-                .map(comment -> new CommentDto(
+        List<CommentDTO> commentDTOS = comments.stream()
+                .map(comment -> new CommentDTO(
                         comment.getIndexId(),
                         comment.getDetail(),
                         comment.getUsers().getUsername(),
@@ -83,7 +82,7 @@ public class CommentController {
                 ))
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(commentDtos); // 댓글 목록 반환
+        return ResponseEntity.ok(commentDTOS); // 댓글 목록 반환
     }
 
     // JWT 토큰에서 사용자 이름 추출 (토큰에서 "Bearer " 접두어 처리)

@@ -1,6 +1,6 @@
 package game.gamegoodgood.post;
 
-public record PostDto(
+public record PostDTO(
         String title,
         String detail,
         String game,

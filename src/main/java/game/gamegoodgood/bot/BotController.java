@@ -13,10 +13,10 @@ public class BotController {
 
     @PostMapping("/sendMessage")
     public ResponseEntity<MessageResponse> sendMessageToDiscord(@RequestBody MessageRequest messageRequest) {
-        // RestTemplate 객체 생성
+
         RestTemplate restTemplate = new RestTemplate();
 
-        // 요청 헤더 설정 (Content-Type: application/json)
+        // 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

@@ -1,6 +1,5 @@
-package game.gamegoodgood.config.auth;
+package game.gamegoodgood.config.jwt;
 
-import game.gamegoodgood.config.auth.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,13 +34,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 // 디버깅: 유효한 토큰과 사용자 정보 출력
-                System.out.println("JWT Token is valid for user: " + authentication.getName());
+                System.out.println("유효한 jwt 토큰 : " + authentication.getName());
             } else {
                 // 유효하지 않은 토큰인 경우
-                System.out.println("Invalid JWT Token");
+                System.out.println("유효하지 않은 토큰입니다.");
             }
         } else {
-            System.out.println("No JWT Token provided");
+            System.out.println("토큰이 없습니다.");
         }
 
         // 필터 체인을 계속 진행
@@ -52,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            System.out.println("Found JWT Token: " + bearerToken); // 로그 추가
+            System.out.println("사용자 JWT 토큰: " + bearerToken);
             return bearerToken.substring(7);  // "Bearer " 이후의 토큰만 반환
         }
         return null;

@@ -1,4 +1,4 @@
-package game.gamegoodgood.config.auth;
+package game.gamegoodgood.config.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

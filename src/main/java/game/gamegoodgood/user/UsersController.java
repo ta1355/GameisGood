@@ -1,13 +1,12 @@
 package game.gamegoodgood.user;
 
-import game.gamegoodgood.config.auth.JwtTokenProvider;
+import game.gamegoodgood.config.jwt.JwtTokenProvider;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,16 +33,16 @@ public class UsersController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // 사용자 생성 엔드포인트
+    // 사용자 생성
     @PostMapping("/user/create")
-    public ResponseEntity<?> createUser(@RequestBody UsersDTO dto) {
+    public ResponseEntity<UsersDTO> createUser(@RequestBody UsersDTO dto) {
         usersService.createUser(dto);
         return ResponseEntity.ok(dto);
     }
 
-    // 로그인 처리 엔드포인트
+    // 로그인 처리
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest loginRequest, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldError() != null
                     ? bindingResult.getFieldError().getDefaultMessage()

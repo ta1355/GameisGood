@@ -10,20 +10,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
 @RestController
 public class PostController {
 
-    private final postService postService;
+    private final PostService postService;
     private final FileUploadService fileUploadService;
 
-    public PostController(postService postService, FileUploadService fileUploadService) {
+    public PostController(PostService postService, FileUploadService fileUploadService) {
         this.postService = postService;
         this.fileUploadService = fileUploadService;
     }
 
-    // 아이디로 찾기 (PostWithUserDto 반환)
+    // 아이디로 찾기
     @GetMapping("/post/{id}")
     public ResponseEntity<PostWithUserDto> findPostById(@PathVariable Long id) {
         PostWithUserDto postDto = postService.findById(id);
@@ -34,7 +33,7 @@ public class PostController {
         }
     }
 
-    // 전체 찾기 (PostWithUserDto 리스트 반환)
+    // 전체 찾기
     @GetMapping("/post")
     public ResponseEntity<Page<PostWithUserDto>> findPostAll(
             @RequestParam(defaultValue = "0") int page,
@@ -45,7 +44,7 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    // 게시글 만들기 (PostWithUserDto 반환)
+    // 게시글 만들기
     @PostMapping("/createpost")
     public ResponseEntity<PostWithUserDto> create(
             @RequestParam("title") String title,
@@ -66,7 +65,7 @@ public class PostController {
         }
 
         // DTO 생성 (이미지 경로 포함)
-        PostDto dto = new PostDto(title, detail, game, imagePath);
+        PostDTO dto = new PostDTO(title, detail, game, imagePath);
 
         // 게시글 저장
         PostWithUserDto createPost = postService.savePost(dto);
@@ -91,6 +90,8 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+
+    // 조회수
     @PostMapping("/post/{id}/view")
     public ResponseEntity<Void> incrementViewCount(@PathVariable Long id) {
         postService.incrementViewCount(id);

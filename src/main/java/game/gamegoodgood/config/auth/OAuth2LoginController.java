@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import game.gamegoodgood.config.jwt.JwtTokenProvider;
 import game.gamegoodgood.user.UserRepository;
 
 import game.gamegoodgood.user.Users;

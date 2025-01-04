@@ -23,7 +23,7 @@ class PostControllerTest {
     private PostController postController;
 
     @Mock
-    private postService postService;
+    private PostService postService;
 
     @Mock
     private FileUploadService fileUploadService;
@@ -81,7 +81,7 @@ class PostControllerTest {
 
         when(fileUploadService.saveImage(any())).thenReturn("path/to/image.jpg");
         PostWithUserDto savedPost = new PostWithUserDto(1L, title, detail, game, "path/to/image.jpg", "testUser", null, null, 0, 0);
-        when(postService.savePost(any(PostDto.class))).thenReturn(savedPost);
+        when(postService.savePost(any(PostDTO.class))).thenReturn(savedPost);
 
         ResponseEntity<PostWithUserDto> response = postController.create(title, detail, game, image);
 

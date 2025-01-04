@@ -1,11 +1,9 @@
 package game.gamegoodgood.comment;
 
-import game.gamegoodgood.post.Post;
-
 import java.time.LocalDateTime;
 
-public record CommentDto(
-        Long id,
+public record CommentDTO(
+        Long indexId,
         String detail,
         String username,
         LocalDateTime createDateTime,
