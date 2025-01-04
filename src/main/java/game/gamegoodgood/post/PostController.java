@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 
 @RestController
 public class PostController {
@@ -91,11 +92,18 @@ public class PostController {
     }
 
 
-    // 조회수
+    // 조회수 증가
     @PostMapping("/post/{id}/view")
     public ResponseEntity<Void> incrementViewCount(@PathVariable Long id) {
         postService.incrementViewCount(id);
         return ResponseEntity.ok().build();
+    }
+
+    //조회수 높은 순
+    @GetMapping("/post/today/popularity")
+    public ResponseEntity<List<PostTodayPopularityDTO>> getTodayPopularPosts() {
+        List<PostTodayPopularityDTO> popularPosts = postService.getTodayTopViewedPosts();
+        return ResponseEntity.ok(popularPosts);
     }
 
 }
