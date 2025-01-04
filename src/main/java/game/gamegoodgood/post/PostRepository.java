@@ -13,7 +13,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<Post> findByIdAndDeletedFalse(Long id);
 
-    @Query("SELECT new game.gamegoodgood.post.PostTodayPopularityDTO(p.title, p.users.username, p.createDateTime, p.viewCount) " +
+    @Query("SELECT new game.gamegoodgood.post.PostTodayPopularityDTO(p.id, p.title, p.users.username, p.createDateTime, p.viewCount) " +
             "FROM Post p " +
             "WHERE p.createDateTime >= :startOfDay " +
             "ORDER BY p.viewCount DESC")
