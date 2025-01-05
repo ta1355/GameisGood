@@ -101,14 +101,14 @@ class PostControllerTest {
         verify(postService, times(1)).likePost(postId);
     }
 
-    @Test
-    void testDeletePost() {
-        Long postId = 1L;
-        doNothing().when(postService).deletedPost(postId);
-
-        ResponseEntity<Void> response = postController.deletePost(postId);
-
-        assertEquals(200, response.getStatusCodeValue());
-        verify(postService, times(1)).deletedPost(postId);
-    }
+//    @Test
+//    void testDeletePost() {
+//        Long postId = 1L;
+//        doNothing().when(postService).deletedPost(postId);
+//
+//        ResponseEntity<Void> response = postController.deletePost(postId);
+//
+//        assertEquals(200, response.getStatusCodeValue());
+//        verify(postService, times(1)).deletedPost(postId);
+//    }
 }

@@ -1,10 +1,14 @@
 package game.gamegoodgood.post;
 
+import game.gamegoodgood.config.jwt.JwtAuthenticationFilter;
+import game.gamegoodgood.config.jwt.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,10 +21,14 @@ public class PostController {
 
     private final PostService postService;
     private final FileUploadService fileUploadService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public PostController(PostService postService, FileUploadService fileUploadService) {
+    public PostController(PostService postService, FileUploadService fileUploadService, JwtTokenProvider jwtTokenProvider, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.postService = postService;
         this.fileUploadService = fileUploadService;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     // 아이디로 찾기
@@ -86,9 +94,20 @@ public class PostController {
 
     // 게시글 삭제
     @DeleteMapping("postdelete/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id){
-        postService.deletedPost(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deletePost(@PathVariable Long id, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            try {
+                postService.deletedPost(id, username);
+                return ResponseEntity.ok().build();
+            } catch (PostExceptions.PostNotFoundException e) {
+                return ResponseEntity.notFound().build();
+            } catch (PostExceptions.UnauthorizedException e) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
 

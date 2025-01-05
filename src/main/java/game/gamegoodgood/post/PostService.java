@@ -88,7 +88,7 @@ public class PostService {
     }
 
     public Page<PostWithUserDto> findAll(Pageable pageable) {
-        Page<Post> postPage = postRepository.findAll(pageable);
+        Page<Post> postPage = postRepository.findAllByDeletedFalse(pageable);
         return postPage.map(post -> new PostWithUserDto(
                 post.getId(),
                 post.getTitle(),
@@ -129,13 +129,17 @@ public class PostService {
     }
 
     @Transactional
-    public void deletedPost(Long id) {
-        Post post = postRepository.findById(id).orElse(null);
-        if (post != null) {
-            log.info("현재 선택하고 있는 게시글 아이디는 " + post.getId());
-            post.deleteTrue();
-            log.info("boolean 상태 " + post.isDeleted());
+    public void deletedPost(Long id, String username) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostExceptions.PostNotFoundException("게시글을 찾을 수 없습니다."));
+
+        if (!post.getUsers().getUsername().equals(username)) {
+            throw new PostExceptions.UnauthorizedException("게시글 삭제 권한이 없습니다.");
         }
+
+        log.info("현재 선택하고 있는 게시글 아이디는 " + post.getId());
+        post.deleteTrue();
+        log.info("boolean 상태 " + post.isDeleted());
     }
 
     // 조회수 증가
