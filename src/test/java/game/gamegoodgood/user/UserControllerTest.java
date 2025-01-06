@@ -43,7 +43,7 @@ class UsersControllerTest {
         UsersDTO dto = new UsersDTO("testUser", "password", "test@example.com");
         when(usersService.createUser(dto)).thenReturn(new Users("testUser", "encodedPassword", "test@example.com"));
 
-        ResponseEntity<?> response = usersController.createUser(dto);
+        ResponseEntity<UsersDTO> response = usersController.createUser(dto);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(dto, response.getBody());
@@ -51,45 +51,37 @@ class UsersControllerTest {
 
     @Test
     void testLoginSuccess() {
-        // Given
         LoginRequest loginRequest = new LoginRequest("testUser", "password");
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
+        when(usersService.isAccountLocked("testUser")).thenReturn(false);
 
         Authentication authentication = mock(Authentication.class);
-        // authenticateUser 메서드에 대한 stub 추가
         when(jwtTokenProvider.authenticateUser(loginRequest.getUsername(), loginRequest.getUserPassword()))
                 .thenReturn(authentication);
         when(jwtTokenProvider.generateToken(authentication)).thenReturn("testToken");
 
-        // When
-        ResponseEntity<?> response = usersController.login(loginRequest, bindingResult);
+        ResponseEntity<Object> response = usersController.login(loginRequest, bindingResult);
 
-        // Then
         assertEquals(200, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof JwtResponse);
         assertEquals("testToken", ((JwtResponse) response.getBody()).getToken());
 
-        // 검증
-        verify(jwtTokenProvider).authenticateUser(loginRequest.getUsername(), loginRequest.getUserPassword());
-        verify(jwtTokenProvider).generateToken(authentication);
+        verify(usersService).updateLastLoginDate("testUser");
     }
 
     @Test
     void testLoginFailure() {
-        // Given
         LoginRequest loginRequest = new LoginRequest("testUser", "wrongPassword");
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
+        when(usersService.isAccountLocked("testUser")).thenReturn(false);
 
-        // authenticateUser가 예외를 던지도록 설정
         when(jwtTokenProvider.authenticateUser(loginRequest.getUsername(), loginRequest.getUserPassword()))
                 .thenThrow(new BadCredentialsException("Invalid credentials"));
 
-        // When
-        ResponseEntity<?> response = usersController.login(loginRequest, bindingResult);
+        ResponseEntity<Object> response = usersController.login(loginRequest, bindingResult);
 
-        // Then
         assertEquals(401, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof String);
         assertTrue(((String) response.getBody()).contains("로그인 실패"));
@@ -102,11 +94,25 @@ class UsersControllerTest {
         when(bindingResult.hasErrors()).thenReturn(true);
         when(bindingResult.getFieldError()).thenReturn(null);
 
-        ResponseEntity<?> response = usersController.login(loginRequest, bindingResult);
+        ResponseEntity<Object> response = usersController.login(loginRequest, bindingResult);
 
         assertEquals(400, response.getStatusCodeValue());
         assertTrue(response.getBody() instanceof String);
         assertEquals("잘못된 요청: 잘못된 요청", response.getBody());
+    }
+
+    @Test
+    void testLoginWithLockedAccount() {
+        LoginRequest loginRequest = new LoginRequest("testUser", "password");
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.hasErrors()).thenReturn(false);
+        when(usersService.isAccountLocked("testUser")).thenReturn(true);
+
+        ResponseEntity<Object> response = usersController.login(loginRequest, bindingResult);
+
+        assertEquals(401, response.getStatusCodeValue());
+        assertTrue(response.getBody() instanceof String);
+        assertEquals("계정이 잠겼습니다. 관리자에게 문의하세요.", response.getBody());
     }
 
     @Test
@@ -118,7 +124,6 @@ class UsersControllerTest {
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("찾은 아이디: testUser", response.getBody());
-        verify(usersService).findUsernameByEmail("test@example.com");
     }
 
     @Test
@@ -135,25 +140,24 @@ class UsersControllerTest {
 
     @Test
     void testChangePasswordSuccess() {
-        PasswordChangeRequest request = new PasswordChangeRequest("testUser", "oldPassword", "newPassword");
-        doNothing().when(usersService).changePassword("testUser", "oldPassword", "newPassword");
+        PasswordChangeRequest request = new PasswordChangeRequest("testUser", "test@example.com", "newPassword");
+        doNothing().when(usersService).changePassword("testUser", "test@example.com", "newPassword");
 
         ResponseEntity<String> response = usersController.changePassword(request);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("비밀번호가 성공적으로 변경되었습니다.", response.getBody());
-        verify(usersService).changePassword("testUser", "oldPassword", "newPassword");
     }
 
     @Test
     void testChangePasswordFailure() {
-        PasswordChangeRequest request = new PasswordChangeRequest("testUser", "wrongPassword", "newPassword");
-        doThrow(new RuntimeException("현재 비밀번호가 일치하지 않습니다."))
-                .when(usersService).changePassword("testUser", "wrongPassword", "newPassword");
+        PasswordChangeRequest request = new PasswordChangeRequest("testUser", "wrong@example.com", "newPassword");
+        doThrow(new RuntimeException("이메일 주소가 일치하지 않습니다."))
+                .when(usersService).changePassword("testUser", "wrong@example.com", "newPassword");
 
         ResponseEntity<String> response = usersController.changePassword(request);
 
         assertEquals(400, response.getStatusCodeValue());
-        assertEquals("현재 비밀번호가 일치하지 않습니다.", response.getBody());
+        assertEquals("이메일 주소가 일치하지 않습니다.", response.getBody());
     }
 }

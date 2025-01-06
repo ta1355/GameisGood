@@ -81,7 +81,4 @@ public class UsersService implements org.springframework.security.core.userdetai
         return ChronoUnit.DAYS.between(lastLoginDate, LocalDateTime.now()) >= 365;
     }
 
-
-
-
 }
