@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.security.Timestamp;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -36,8 +37,6 @@ public class Users implements UserDetails {
 
     private boolean deleted = false;
 
-    private Timestamp loginDate;
-
     @CreationTimestamp
     private LocalDateTime CreateDateTime;
 
@@ -49,6 +48,8 @@ public class Users implements UserDetails {
 
     @OneToMany(mappedBy = "users")
     private List<Comment> comments = new ArrayList<>();
+
+    private LocalDateTime lastLoginDate;
 
     public Long getIndexId() {
         return IndexId;
@@ -94,14 +95,6 @@ public class Users implements UserDetails {
         this.deleted = deleted;
     }
 
-    public Timestamp getLoginDate() {
-        return loginDate;
-    }
-
-    public void setLoginDate(Timestamp loginDate) {
-        this.loginDate = loginDate;
-    }
-
     public LocalDateTime getCreateDateTime() {
         return CreateDateTime;
     }
@@ -132,6 +125,14 @@ public class Users implements UserDetails {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public LocalDateTime getLastLoginDate() {
+        return lastLoginDate;
+    }
+
+    public void setLastLoginDate(LocalDateTime lastLoginDate) {
+        this.lastLoginDate = lastLoginDate;
     }
 
     public void deleteTrue() {
@@ -165,14 +166,19 @@ public class Users implements UserDetails {
         return this.username;  // 사용자 이름 반환
     }
 
+    // 계정 만료 여부
     @Override
     public boolean isAccountNonExpired() {
-        return true;  // 계정 만료 여부
+        if (lastLoginDate == null) {
+            return true; // 새 계정의 경우
+        }
+        return ChronoUnit.DAYS.between(lastLoginDate, LocalDateTime.now()) < 365; // 1년 이내 로그인
     }
 
+    // 계정 잠금 여부
     @Override
     public boolean isAccountNonLocked() {
-        return true;  // 계정 잠금 여부
+        return isAccountNonExpired(); // 계정 만료 여부와 동일한 조건 사용
     }
 
     @Override

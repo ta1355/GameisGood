@@ -6,6 +6,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 public class UsersService implements org.springframework.security.core.userdetails.UserDetailsService {
@@ -58,6 +62,26 @@ public class UsersService implements org.springframework.security.core.userdetai
         user.setUserPassword(encodedNewPassword);
         userRepository.save(user);
     }
+
+    @Transactional
+    public void updateLastLoginDate(String username) {
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        user.setLastLoginDate(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    public boolean isAccountLocked(String username) {
+        Users user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        LocalDateTime lastLoginDate = user.getLastLoginDate();
+        if (lastLoginDate == null) {
+            return false; // 새 계정의 경우
+        }
+        return ChronoUnit.DAYS.between(lastLoginDate, LocalDateTime.now()) >= 365;
+    }
+
+
 
 
 }

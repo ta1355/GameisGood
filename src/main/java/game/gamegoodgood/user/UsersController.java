@@ -51,11 +51,17 @@ public class UsersController {
         }
 
         try {
+
+            if (usersService.isAccountLocked(loginRequest.getUsername())) {
+                return ResponseEntity.status(401).body("계정이 잠겼습니다. 관리자에게 문의하세요.");
+            }
+
             Authentication authentication = jwtTokenProvider.authenticateUser(
                     loginRequest.getUsername(),
                     loginRequest.getUserPassword()
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            usersService.updateLastLoginDate(loginRequest.getUsername());
             logger.info("로그인 성공: 사용자 '{}' 인증 완료", loginRequest.getUsername());
 
             String token = jwtTokenProvider.generateToken(authentication);

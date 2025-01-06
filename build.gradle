@@ -49,6 +49,8 @@ dependencies {
 	// Validation Starter
 	implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final' // Hibernate Validator
 	implementation 'jakarta.validation:jakarta.validation-api:3.0.0' // Jakarta Validation API (Spring Boot 3.x 이상에서 필요)
+
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 tasks.named('test') {

@@ -30,7 +30,7 @@ public class JwtTokenProvider {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
 
-        // 안전한 512비트 비밀 키 생성
+        // 512비트 비밀 키 생성
         this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);  // HS512에 적합한 512비트 키 생성
     }
 
@@ -38,7 +38,7 @@ public class JwtTokenProvider {
     public String generateToken(Authentication authentication) {
         String username;
 
-        // OAuth2 인증 (예: 구글 로그인 등)
+        // OAuth2 인증
         if (authentication instanceof OAuth2AuthenticationToken) {
             OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
             OAuth2User oAuth2User = oAuth2AuthenticationToken.getPrincipal();
