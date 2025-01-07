@@ -68,8 +68,8 @@ class UsersServiceTest {
 
         assertNotNull(createdUser);
         assertEquals(dto.username(), createdUser.getUsername());
-        assertTrue(passwordEncoder.matches(dto.userPassword(), createdUser.getUserPassword()));
-        assertEquals(dto.userEmail(), createdUser.getUserEmail());
+        assertTrue(passwordEncoder.matches(dto.password(), createdUser.getUserPassword()));
+        assertEquals(dto.email(), createdUser.getUserEmail());
         assertEquals("USER", createdUser.getRole());
     }
 

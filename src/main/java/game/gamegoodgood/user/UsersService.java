@@ -35,11 +35,11 @@ public class UsersService implements org.springframework.security.core.userdetai
         }
 
         // 비밀번호 암호화
-        String rawPassword = dto.userPassword();
+        String rawPassword = dto.password();
         String encPassword = passwordEncoder.encode(rawPassword);
 
         // 새로운 사용자 저장
-        Users users = new Users(dto.username(), encPassword, dto.userEmail());
+        Users users = new Users(dto.username(), encPassword, dto.email());
         users.setRole("USER"); // 기본 역할 설정
         return userRepository.save(users);
     }
