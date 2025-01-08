@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/posts/{postId}/comments").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/find-username").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/change-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/sendMessage").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/create").permitAll()
                         .requestMatchers(HttpMethod.GET, "/game/specials").permitAll()
                         .requestMatchers(HttpMethod.GET, "/game/top_sellers").permitAll()
