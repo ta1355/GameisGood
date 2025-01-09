@@ -65,6 +65,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/game/new_releases").permitAll()
                         .requestMatchers(HttpMethod.GET, "/game/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/search/{search}").permitAll()
+                        .requestMatchers("/img/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
