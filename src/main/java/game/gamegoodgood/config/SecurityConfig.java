@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/post/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/post/{id}/view").permitAll()
                         .requestMatchers(HttpMethod.POST, "/createpost").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/post/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/posts/{postId}/comments").authenticated()
                         .requestMatchers(HttpMethod.GET, "/posts/{postId}/comments").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/find-username").permitAll()
@@ -85,7 +86,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList(
                 "Authorization",
                 "Content-Type",

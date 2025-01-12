@@ -110,7 +110,6 @@ public class PostController {
         }
     }
 
-
     // 조회수 증가
     @PostMapping("/post/{id}/view")
     public ResponseEntity<Void> incrementViewCount(@PathVariable Long id) {
@@ -125,4 +124,30 @@ public class PostController {
         return ResponseEntity.ok(popularPosts);
     }
 
+    //게시글 수정
+    @PatchMapping("/post/{id}")
+    public ResponseEntity<PostWithUserDto> updatePost(@PathVariable Long id, @ModelAttribute PostDTO postDTO, @RequestParam(value = "image", required = false) MultipartFile image,
+                                                      Authentication authentication) {
+        try {
+            String username = authentication.getName();
+
+            // 이미지 파일이 존재한다면, 저장 후 경로 반환
+            String imagePath = null;
+            if (image != null) {
+                try {
+                    imagePath = fileUploadService.saveImage(image);  // 이미지 파일을 서버에 저장
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+                }
+            }
+
+            PostWithUserDto updatedPost = postService.updatePost(id, postDTO, imagePath, username);
+            return ResponseEntity.ok(updatedPost);
+        } catch (PostExceptions.UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (PostExceptions.PostNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

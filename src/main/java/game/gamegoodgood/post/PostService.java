@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -158,7 +159,43 @@ public class PostService {
         return postRepository.findTodayTopViewedPosts(startOfDay, pageRequest);
     }
 
+    // 게시글 수정
+    @Transactional
+    public PostWithUserDto updatePost(Long id, PostDTO postDTO, String imagePath, String username) throws PostExceptions.UnauthorizedException, PostExceptions.PostNotFoundException {
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostExceptions.PostNotFoundException("게시글을 찾을 수 없습니다."));
 
+        if (!post.getUsers().getUsername().equals(username)) {
+            throw new PostExceptions.UnauthorizedException("게시글 수정 권한이 없습니다.");
+        }
 
+        updatePostFields(post, postDTO, imagePath);
+        Post updatedPost = postRepository.save(post);
+        return new PostWithUserDto(
+                updatedPost.getId(),
+                updatedPost.getTitle(),
+                updatedPost.getDetail(),
+                updatedPost.getGame(),
+                updatedPost.getImage(),
+                updatedPost.getUsers().getUsername(),
+                updatedPost.getCreateDateTime(),
+                updatedPost.getDeletedDateTime(),
+                updatedPost.getLikeCount(),
+                updatedPost.getViewCount()
+        );
+    }
 
+    private void updatePostFields(Post post, PostDTO postDTO, String imagePath) {
+        if (postDTO.title() != null) {
+            post.setTitle(postDTO.title());
+        }
+        if (postDTO.detail() != null) {
+            post.setDetail(postDTO.detail());
+        }
+        if (postDTO.game() != null) {
+            post.setGame(postDTO.game());
+        }
+        if (imagePath != null) {
+            post.setImage(imagePath);
+        }
+    }
 }
