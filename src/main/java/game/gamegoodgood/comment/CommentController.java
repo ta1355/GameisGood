@@ -1,101 +1,71 @@
 package game.gamegoodgood.comment;
 
 import game.gamegoodgood.config.jwt.JwtTokenProvider;
-import game.gamegoodgood.post.Post;
-import game.gamegoodgood.post.PostRepository;
-import game.gamegoodgood.user.UserRepository;
-import game.gamegoodgood.user.Users;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class CommentController {
-
     private final CommentService commentService;
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider; // JwtTokenProvider 주입
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public CommentController(CommentService commentService, PostRepository postRepository,
-                             UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
+    public CommentController(CommentService commentService, JwtTokenProvider jwtTokenProvider) {
         this.commentService = commentService;
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    // 댓글 생성
+    //댓글 작성
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentDTO> createComment(@PathVariable Long postId, @RequestBody CommentDTO dto,
                                                     @RequestHeader("Authorization") String token) {
-        // JWT 토큰에서 사용자 정보 추출
         String username = extractUsernameFromToken(token);
-
         if (username == null) {
-            return ResponseEntity.status(401).build(); // 인증되지 않은 사용자 처리
+            return ResponseEntity.status(401).build();
         }
-
-        // 해당 postId에 맞는 Post 조회
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-
-        // JWT 토큰에서 인증된 사용자 정보로 유저 조회
-        Users user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-
-        // 댓글 생성 및 저장
-        Comment comment = commentService.createComment(post, dto.detail(), user);
-
-        // CommentDto로 변환하여 응답
-        CommentDTO responseDto = new CommentDTO(
-                comment.getIndexId(),
-                comment.getDetail(),
-                comment.getUsers().getUsername(),
-                comment.getCreatedDateTime(),
-                comment.getPost().getId()
-        );
-
-        return ResponseEntity.ok(responseDto); // 성공적으로 댓글 생성
+        CommentDTO createdComment = commentService.createComment(postId, dto.detail(), username);
+        return ResponseEntity.ok(createdComment);
     }
 
-    // 댓글 목록 조회 (특정 게시글에 대한 모든 댓글 조회)
+
+    // 게시글에 대한 댓글 조회
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<List<CommentDTO>> findAllByPostId(@PathVariable Long postId) {
-        // 해당 postId에 맞는 Post 조회
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-
-        // 해당 게시글에 대한 모든 댓글을 조회
-        List<Comment> comments = commentService.findAllByPost(post);
-
-        // 댓글 목록을 CommentDto 목록으로 변환
-        List<CommentDTO> commentDTOS = comments.stream()
-                .map(comment -> new CommentDTO(
-                        comment.getIndexId(),
-                        comment.getDetail(),
-                        comment.getUsers().getUsername(),
-                        comment.getCreatedDateTime(),
-                        comment.getPost().getId()
-                ))
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(commentDTOS); // 댓글 목록 반환
+        List<CommentDTO> comments = commentService.findAllByPostId(postId);
+        return ResponseEntity.ok(comments);
     }
 
-    // JWT 토큰에서 사용자 이름 추출 (토큰에서 "Bearer " 접두어 처리)
+    //댓글 삭제(하드)
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId, @RequestHeader("Authorization") String token){
+        String username = extractUsernameFromToken(token);
+
+        if (username ==null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증되지 않은 사용자입니다.");
+        }
+
+        try {
+            commentService.deleteComment(commentId,username);
+            return ResponseEntity.ok("댓글이 성공적으로 삭제되었습니다.");
+
+        }catch (RuntimeException e){
+            return  ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
+
+    // 토큰검증
     private String extractUsernameFromToken(String token) {
         if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " 접두어를 제거한 토큰만 추출
+            token = token.substring(7);
             try {
-                return jwtTokenProvider.getUsernameFromToken(token); // JWT 토큰에서 사용자 이름 추출
+                return jwtTokenProvider.getUsernameFromToken(token);
             } catch (Exception e) {
-                // 예외 발생 시 null 반환
                 return null;
             }
         }
-        return null; // "Bearer "가 포함되지 않은 토큰은 처리하지 않음
+        return null;
     }
 }
+

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -163,4 +164,62 @@ class PostControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(popularPosts, response.getBody());
     }
+
+    @Test
+    void testUpdatePost_Success() throws IOException {
+        Long postId = 1L;
+        String username = "testUser";
+        PostDTO postDTO = new PostDTO("Updated Title", "Updated Detail", "Updated Game", null);
+        MockMultipartFile image = new MockMultipartFile("image", "test.jpg", "image/jpeg", "test image content".getBytes());
+
+        when(authentication.getName()).thenReturn(username);
+        when(fileUploadService.saveImage(any())).thenReturn("path/to/updated_image.jpg");
+        when(postService.updatePost(eq(postId), any(PostDTO.class), eq("path/to/updated_image.jpg"), eq(username)))
+                .thenReturn(new PostWithUserDto(postId, "Updated Title", "Updated Detail", "Updated Game",
+                        "path/to/updated_image.jpg", username, LocalDateTime.now(), null, 0, 0));
+
+        ResponseEntity<PostWithUserDto> response = postController.updatePost(postId, postDTO, image, authentication);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Updated Title", response.getBody().title());
+        assertEquals("Updated Detail", response.getBody().detail());
+        assertEquals("Updated Game", response.getBody().game());
+        assertEquals("path/to/updated_image.jpg", response.getBody().image());
+        assertNull(response.getBody().deletedDateTime());
+        assertEquals(0, response.getBody().likeCount());
+        assertEquals(0, response.getBody().viewCount());
+    }
+
+    @Test
+    void testUpdatePost_Unauthorized() throws IOException {
+        Long postId = 1L;
+        String username = "testUser";
+        PostDTO postDTO = new PostDTO("Updated Title", "Updated Detail", "Updated Game", null);
+
+        when(authentication.getName()).thenReturn(username);
+        when(postService.updatePost(eq(postId), any(PostDTO.class), isNull(), eq(username)))
+                .thenThrow(new PostExceptions.UnauthorizedException("Unauthorized to update this post"));
+
+        ResponseEntity<PostWithUserDto> response = postController.updatePost(postId, postDTO, null, authentication);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    void testUpdatePost_NotFound() throws IOException {
+        Long postId = 1L;
+        String username = "testUser";
+        PostDTO postDTO = new PostDTO("Updated Title", "Updated Detail", "Updated Game", null);
+
+        when(authentication.getName()).thenReturn(username);
+        when(postService.updatePost(eq(postId), any(PostDTO.class), isNull(), eq(username)))
+                .thenThrow(new PostExceptions.PostNotFoundException("Post not found"));
+
+        ResponseEntity<PostWithUserDto> response = postController.updatePost(postId, postDTO, null, authentication);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+
 }

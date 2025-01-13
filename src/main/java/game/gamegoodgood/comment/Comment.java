@@ -24,11 +24,7 @@ public class Comment {
     @ManyToOne
     private Users users;
 
-    private boolean deleted= false;
-
     private LocalDateTime createdDateTime= LocalDateTime.now();
-
-    private LocalDateTime deletedDAteTime;
 
     public Comment() {
     }
@@ -71,14 +67,6 @@ public class Comment {
         this.users = users;
     }
 
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
     public LocalDateTime getCreatedDateTime() {
         return createdDateTime;
     }
@@ -87,22 +75,8 @@ public class Comment {
         this.createdDateTime = createdDateTime;
     }
 
-    public LocalDateTime getDeletedDAteTime() {
-        return deletedDAteTime;
-    }
-
-    public void setDeletedDAteTime(LocalDateTime deletedDAteTime) {
-        this.deletedDAteTime = deletedDAteTime;
-    }
-
-    public void deleteTrue() {
-        this.deleted =true;
-        deletedDAteTime=LocalDateTime.now();
-    }
-
     public String getUsername() {
         return users != null ? users.getUsername() : null;
     }
-
 
 }

@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/post/{id}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/posts/{postId}/comments").authenticated()
                         .requestMatchers(HttpMethod.GET, "/posts/{postId}/comments").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/comments/{commentId}").authenticated()
                         .requestMatchers(HttpMethod.POST, "/user/find-username").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/change-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/sendMessage").permitAll()
