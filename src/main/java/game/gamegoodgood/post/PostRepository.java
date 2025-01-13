@@ -25,6 +25,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByDeletedFalse(Pageable pageable);
 
+    @Query("SELECT p FROM Post p WHERE p.deleted = true AND p.deletedDateTime < :date")
+    List<Post> findSoftDeletedBefore(@Param("date") LocalDateTime date);
+
+
 }
 
 

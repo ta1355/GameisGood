@@ -22,7 +22,7 @@ import java.util.Map;
 public class JwtTokenProvider {
 
     private final SecretKey secretKey;
-    private final long JWT_EXPIRATION = 86400000L;  // 토큰 만료 시간 (24시간)
+    private final long JWT_EXPIRATION = 3600000L;  // 토큰 만료 시간 (1시간)
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
