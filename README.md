@@ -17,3 +17,8 @@
 - 백엔드: Java, SpringBoot
 
 - 데이터베이스: Mysql
+
+
+---
+
+프론트엔드: https://github.com/ta1355/gameisgood-front
